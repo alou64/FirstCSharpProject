@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 
+
 namespace FirstProject.Models
 {
-  public class PointOfInterestForCreationDto
+  public class PointOfInterestForUpdateDto
   {
     [Required(ErrorMessage = "Must provide name value")]    // data annotation
     [MaxLength(60)]
