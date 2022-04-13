@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.Extensions.Logging;
 using FirstProject.Models;
+using FirstProject.Services;
 
 namespace FirstProject.Controllers
 {
@@ -10,11 +11,14 @@ namespace FirstProject.Controllers
   public class PointsOfInterestController : ControllerBase
   {
     private readonly ILogger<PointsOfInterestController> _logger;
+    private readonly IMailService _mailService;
 
     // constructer injection
-    public PointsOfInterestController(ILogger<PointsOfInterestController> logger)
+    public PointsOfInterestController(ILogger<PointsOfInterestController> logger,
+      IMailService mailService)
     {
       _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+      _mailService = mailService ?? throw new ArgumentNullException(nameof(mailService));
     }
 
     [HttpGet]
@@ -221,6 +225,10 @@ namespace FirstProject.Controllers
 
       // delete point of interest
       city.PointsOfInterest.Remove(pointOfInterestFromStore);
+
+      // send "email" via LocalMailService
+      _mailService.Send("Point of interest deleted",
+        $"Point of interest {pointOfInterestFromStore.Name} with id {pointOfInterestFromStore.Id} deleted.");
 
       return NoContent();
     }

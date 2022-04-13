@@ -1,5 +1,6 @@
 using NLog.Web;
 using NLog;
+using FirstProject.Services;
 
 var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
@@ -14,6 +15,13 @@ try
 
   builder.Services.AddControllers()
     .AddNewtonsoftJson();
+
+#if DEBUG  
+  builder.Services.AddTransient<IMailService, LocalMailService>();
+#else
+  builder.Services.AddTransient<IMailService, CloudMailService>();
+#endif
+
   // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
   builder.Services.AddEndpointsApiExplorer();
   builder.Services.AddSwaggerGen();
