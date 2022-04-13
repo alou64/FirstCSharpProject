@@ -9,6 +9,8 @@ namespace FirstProject.Controllers
   [Route("api/cities/{cityId}/pointsofinterest")]    // it is a child of cities
   public class PointsOfInterestController : ControllerBase
   {
+    private readonly ILogger<PointsOfInterestController> _logger;
+
     // constructer injection
     public PointsOfInterestController(ILogger<PointsOfInterestController> logger)
     {
@@ -18,15 +20,24 @@ namespace FirstProject.Controllers
     [HttpGet]
     public IActionResult GetPointsOfInterest(int cityId)
     {
-      var city = CitiesDataStore.Current.Cities
-        .FirstOrDefault(c => c.Id == cityId);
-
-      if (city == null)
+      try
       {
-        return NotFound();
-      }
+        var city = CitiesDataStore.Current.Cities
+          .FirstOrDefault(c => c.Id == cityId);
 
-      return Ok(city.PointsOfInterest);
+        if (city == null)
+        {
+          _logger.LogInformation($"City with id {cityId} not found");
+          return NotFound();
+        }
+
+        return Ok(city.PointsOfInterest);
+      }
+      catch (Exception ex)
+      {
+        _logger.LogCritical($"Exception while getting points of interest for city wit id {cityId}", ex);
+        return StatusCode(500, "A problem occurred while handling your request");
+      }
     }
 
     // get single point of interest
